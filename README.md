@@ -1,4 +1,6 @@
-# Fake Systemd
+# Fake Systemd for WSL
+
+This is a fork from [Fake Systemd](https://github.com/kvaps/fake-systemd) specifically for WSL and Debian.
 
 Simple bash script using start-stop-daemon, instead of using original systemctl + dbus + priviliges + seccomp + x packages + conjunction of mercury and venus.
 
