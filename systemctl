@@ -3,6 +3,11 @@
 # lower vars:     in local function
 # camelcase vars: systemd params var
 
+
+if [ ! -d /pids ]; then
+    mkdir /pids
+fi
+
 function get_unit_file(){
     for dir in ${UNIT_PATHS[@]} ; do
         if [ -f "${dir}${UNIT}" ] ; then
@@ -125,7 +130,7 @@ function action_start(){
 
         makepid=""
         if [ -z "$PIDFile" ]; then
-            PIDdir="/run/${UNIT_NAME}"
+            PIDdir="/pids/${UNIT_NAME}"
 
             mkdir -p $PIDdir
             [ -n "$User" ] && chown $User $PIDdir
@@ -135,7 +140,7 @@ function action_start(){
 
         [ -f "$EnvironmentFile" ] && source "$EnvironmentFile"
 
-        cmd=("/usr/bin/start-stop-daemon --background --start --pidfile $PIDFile $makepid")
+        cmd=("$(which start-stop-daemon) --background --start --pidfile $PIDFile $makepid")
 
         [ -f "$WorkingDirectory" ] && cmd+=("--chdir $WorkingDirectory")
         [ -n "$User" ] && cmd+=("--chuid $User")
@@ -169,7 +174,7 @@ function action_stop(){
     local ExecStopPost=$(read_multioption ExecStopPost)
     local Environment=$(read_multioption Environment)
 
-    [ -z "$PIDFile" ] && PIDFile="/run/${UNIT_NAME}/${UNIT_NAME}.pid"
+    [ -z "$PIDFile" ] && PIDFile="/pids/${UNIT_NAME}/${UNIT_NAME}.pid"
     [ -f "$EnvironmentFile" ] && source "$EnvironmentFile"
 
     # export Environnement
@@ -180,7 +185,7 @@ function action_stop(){
 
     # Stop service 
     if [ -z "$ExecStop" ] ; then
-        cmd="/usr/bin/start-stop-daemon --stop --pidfile $PIDFile"
+        cmd="$(which start-stop-daemon) --stop --pidfile $PIDFile"
         [ -n "$User" ] && cmd+=("--chuid $User")
     else
         cmd="$ExecStop"
@@ -279,7 +284,8 @@ function _get_pid(){
     local PIDFile=$(read_option PIDFile)
 
     # set default pifile
-    [ -z "$PIDFile" ] && PIDFile="/run/${UNIT_NAME}/${UNIT_NAME}.pid"
+    [ -z "$PIDFile" ] && PIDFile="/pids/${UNIT_NAME}/${UNIT_NAME}.pid"
+
 
     # now check if the pidfile exists
     if [ ! -f "$PIDFile" ]; then
