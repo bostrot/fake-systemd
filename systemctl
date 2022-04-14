@@ -11,7 +11,13 @@ function fake_systemctl_start() {
     for service in /etc/systemd/system/multi-user.target.wants/*;
     do
         first=${service##*/}
-        if [[ $first == *service ]] && [[ $first != networking.service ]]; then
+        if [[ $first == *service ]] &&
+           [[ $first != networking.service ]] &&
+           [[ $first != rsyslog.service ]] &&
+           [[ $first != inithooks.service ]] &&
+           [[ $first != shellinabox.service ]] &&
+           [[ $first != *stunnel4* ]] &&
+           [[ $first != rsync.service ]]; then
             name=${first/.service}
             echo -n "Starting $name... "
             systemctl start $name &>> /var/log/fake_systemd.log
