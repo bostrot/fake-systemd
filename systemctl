@@ -3,6 +3,11 @@
 # lower vars:     in local function
 # camelcase vars: systemd params var
 
+# Copy to fake-systemd for process starter
+if [ ! -f /usr/bin/systemctl ]; then 
+    cp /usr/bin/systemctl /usr/bin/fake-systemctl
+fi
+
 # Add to startup with bashrc
 if ! grep -q fake_systemctl_start ~/.bashrc; then
     echo '
@@ -20,7 +25,7 @@ function fake_systemctl_start() {
            [[ $first != rsync.service ]]; then
             name=${first/.service}
             echo -n "Starting $name... "
-            systemctl start $name &>> /var/log/fake_systemd.log
+            fake-systemctl start $name &>> /var/log/fake_systemd.log
             if (( $? == 0 )); then
                 echo "OK"
             else
