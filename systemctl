@@ -4,7 +4,7 @@
 # camelcase vars: systemd params var
 
 # Copy to fake-systemd for process starter
-if [ ! -f /usr/bin/systemctl ]; then 
+if [ ! -f /usr/bin/fake-systemctl ]; then 
     cp /usr/bin/systemctl /usr/bin/fake-systemctl
 fi
 
